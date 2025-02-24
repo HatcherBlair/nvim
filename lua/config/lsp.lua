@@ -1,8 +1,5 @@
 vim.opt.signcolumn = 'yes'
 
-require('java').setup()
-require('lspconfig').jdtls.setup({})
-
 local lspconfig_defaults = require('lspconfig').util.default_config
 lspconfig_defaults.capabilities = vim.tbl_deep_extend(
     'force',
