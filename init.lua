@@ -424,8 +424,17 @@ require('lazy').setup({
 
       local capabilities = require('blink.cmp').get_lsp_capabilities()
       local servers = {
-        clangd = {},
-
+        clangd = {
+          cmd = {
+            'clangd',
+            '--pretty',
+            '--all-scopes-completion',
+            '--background-index',
+            '--function-arg-placeholders=false',
+            '--header-insertion=iwyu',
+          },
+        },
+        pyright = {},
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
@@ -447,7 +456,6 @@ require('lazy').setup({
         'stylua', -- Used to format Lua code
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
-
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_installation = false,
@@ -464,7 +472,6 @@ require('lazy').setup({
       }
     end,
   },
-
   { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -490,10 +497,11 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         cpp = { 'clangformat' },
+        python = { 'black', 'isort' },
+        json = { 'prettier' },
       },
     },
   },
-
   { -- Autocompletion
     'saghen/blink.cmp',
     event = 'VimEnter',
@@ -564,29 +572,16 @@ require('lazy').setup({
       signature = { enabled = true },
     },
   },
-
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
+  {
+    'oxfist/night-owl.nvim',
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
+    priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
-      ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
-        },
-      }
-
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      -- load the colorscheme here
+      require('night-owl').setup()
+      vim.cmd.colorscheme 'night-owl'
     end,
   },
-
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -633,7 +628,7 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'cpp', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'cpp', 'diff', 'html', 'json', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'python', 'query', 'vim', 'vimdoc' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -656,6 +651,11 @@ require('lazy').setup({
     'mrcjkb/rustaceanvim',
     version = '^6',
     lazy = false,
+  },
+  {
+    'ThePrimeagen/harpoon',
+    branch = 'harpoon2',
+    dependencies = { 'nvim-lua/plenary.nvim' },
   },
 
   require 'kickstart.plugins.debug',
@@ -689,6 +689,37 @@ require('lazy').setup({
 })
 
 require 'remap'
+
+local harpoon = require 'harpoon'
+harpoon:setup()
+
+-- Add to harpoon
+vim.keymap.set('n', '<leader>a', function()
+  harpoon:list():add()
+end, { desc = '[A]dd to Harpoon list' })
+
+-- Toggle quick picker menu
+vim.keymap.set('n', '<C-e>', function()
+  harpoon.ui:toggle_quick_menu(harpoon:list())
+end, { desc = 'Toggle Harpoon Picker' })
+
+-- Select files
+vim.keymap.set('n', '<leader>z', function()
+  harpoon:list():select(1)
+end, { desc = 'Harpoon option 1' })
+vim.keymap.set('n', '<leader>x', function()
+  harpoon:list():select(2)
+end, { desc = 'Harpoon option 2' })
+vim.keymap.set('n', '<leader>c', function()
+  harpoon:list():select(3)
+end, { desc = 'Harpoon option 3' })
+vim.keymap.set('n', '<leader>v', function()
+  harpoon:list():select(4)
+end, { desc = 'Harpoon option 4' })
+
+-- Toggle previous and next buffers, not that advanced yet. Maybe enable latter
+-- vim.keymap.set("n", <C-S-P>, function() harpoon:list():prev() end)
+-- vim.keymap.set("n", <C-S-N>, function() harpoon:list():next() end)
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
