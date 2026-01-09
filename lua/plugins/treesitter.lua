@@ -1,5 +1,4 @@
 -- Better highlighting
--- Uses the main branch, aka the one that is breaking everything
 return {
 	{
 		"nvim-treesitter/nvim-treesitter",
