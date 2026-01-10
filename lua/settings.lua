@@ -11,6 +11,9 @@ vim.o.expandtab = true
 vim.opt.number = true
 vim.opt.relativenumber = true
 
+-- Always have 10 lines
+vim.o.scrolloff = 10
+
 -- Mouse mode
 vim.o.mouse = "a"
 
@@ -50,22 +53,22 @@ vim.o.confirm = true
 vim.o.inccommand = "split"
 
 -- Show Erorrs/Warnings at end of line
-vim.diagnostic.config {
-    severity_sort = true,
-    float = {border = 'rounded', source = 'if_many'},
-    underline = {severity = vim.diagnostic.severity.ERROR},
-    signs = vim.g.have_nerd_font or {},
-    virtual_text = {
-        source = 'if_many',
-        spacing = 2,
-        format = function (diagnostic)
-            local diagnostic_message = {
-                [vim.diagnostic.severity.ERROR] = diagnostic.message,
-                [vim.diagnostic.severity.WARN] = diagnostic.message,
-                [vim.diagnostic.severity.HINT] = diagnostic.message,
-                [vim.diagnostic.severity.INFO] = diagnostic.message,
-            }
-            return diagnostic_message[diagnostic.severity]
-        end,
-    },
-}
+vim.diagnostic.config({
+	severity_sort = true,
+	float = { border = "rounded", source = "if_many" },
+	underline = { severity = vim.diagnostic.severity.ERROR },
+	signs = vim.g.have_nerd_font or {},
+	virtual_text = {
+		source = "if_many",
+		spacing = 2,
+		format = function(diagnostic)
+			local diagnostic_message = {
+				[vim.diagnostic.severity.ERROR] = diagnostic.message,
+				[vim.diagnostic.severity.WARN] = diagnostic.message,
+				[vim.diagnostic.severity.HINT] = diagnostic.message,
+				[vim.diagnostic.severity.INFO] = diagnostic.message,
+			}
+			return diagnostic_message[diagnostic.severity]
+		end,
+	},
+})
