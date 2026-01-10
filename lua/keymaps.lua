@@ -23,3 +23,15 @@ vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to left window" 
 vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to lower window" })
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to upper window" })
 vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to right window" })
+
+-- Insert empty lines below/above
+local function blank_below()
+	vim.cmd("put = ''")
+end
+
+local function blank_above()
+	vim.cmd("put! = ''")
+end
+
+vim.keymap.set("n", "]o", blank_below, { desc = "Insert blank line below" })
+vim.keymap.set("n", "[o", blank_above, { desc = "Insert blank line above" })

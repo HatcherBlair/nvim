@@ -2,7 +2,7 @@
 
 local M = {}
 
--- I hate these things
+-- Cmd to toggle later
 vim.g.inlay_hints = false
 
 -- Set up LSP keymaps and autocommands
@@ -21,6 +21,7 @@ local function on_attach(client, bufnr)
 		vim.keymap.set(mode, lhs, rhs, opts)
 	end
 
+	-- Diagnostic Navigation
 	keymap("[d", function()
 		vim.diagnostic.jump({ count = -1 })
 	end, "Previous diagnostic")
@@ -28,12 +29,18 @@ local function on_attach(client, bufnr)
 		vim.diagnostic.jump({ count = 1 })
 	end, "Next diagnostic")
 
+	-- Error Navigation
 	keymap("[e", function()
 		vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR })
 	end, "Previous error")
 	keymap("]e", function()
 		vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR })
 	end, "Next error")
+
+	-- Show Diagnostic overlay
+	keymap("<leader>d", function()
+		vim.diagnostic.open_float()
+	end, "Open Diagnostic Menu")
 
 	-- Document colors
 	vim.lsp.document_color.enable(true, bufnr)
@@ -45,18 +52,48 @@ local function on_attach(client, bufnr)
 
 	-- Find references
 	if client:supports_method("textDocument/references") then
-		keymap("grr", "<cmd>FzfLua lsp_reference<cr>", "vim.lsp.buf.references()")
+		keymap("grr", "<cmd>FzfLua lsp_references<cr>", "vim.lsp.buf.references()")
 	end
 
 	-- Go to type definition
 	if client:supports_method("textDocument/typeDefinition") then
-		keymap("gy", "<cmd>Fzflua lsp_typedef<cr>", "Go to type definition")
+		keymap("gy", "<cmd>FzfLua lsp_typedefs<cr>", "Go to type definition")
 	end
 
-	-- Search [f]ile [s]ymbols
+	--*** Search commands ***--
+	-- Configured here because some rely on LSP features
+	-- [f]iles
+	keymap("<leader>ff", "<cmd>FzfLua files<cr>", "[f]ind [f]iles")
+
+	-- project [g]rep
+	keymap("<leader>fg", "<cmd>FzfLua live_grep<cr>", "[f]ind [g]rep")
+
+	-- [b]uffer grep
+	keymap("<leader>fb", "<cmd>FzfLua lgrep_curbuf<cr>", "[f]ind [b]uffer grep")
+
+	-- current [w]ord
+	keymap("<leader>fw", "<cmd>FzfLua grep_cWORD<cr>", "[f]ind Current [w]ord")
+
+	-- [s]ymbols
 	if client:supports_method("textDocument/documentSymbol") then
-		keymap("<leader>fs", "<cmd>Fzflua lsp_document_symbols<cr>", "Document symbols")
+		keymap("<leaader>fs", "<cmd>FzfLua lsp_document_symbols<cr>", "[f]ind Document [s]ymbols")
 	end
+
+	-- buffer [d]iagnostics
+	if client:supports_method("textDocument/diagnostic") then
+		keymap("<leader>fd", "<cmd>FzfLua diagnostics_document<cr>", "[f]ind Document [d]iagnostic")
+	end
+
+	-- project [D]iagnostics
+	if client:supports_method("workspace/diagnostic") then
+		keymap("<leader>fD", "<cmd>FzfLua diagnostics_workspace<cr>", "[f]ind Workspace [D]iagnostic")
+	end
+
+	-- [q]uickfix
+	keymap("<leader>fq", "<cmd>FzfLua lgrep_quickfix<cr>", "[f]ind [q]uickfix")
+
+	-- [h]elp tags
+	keymap("<leader>fh", "<cmd>FzfLua helptags<cr>", "[f]ind [h]elp tags")
 
 	-- Goto and Peek definition
 	if client:supports_method("textDocument/definition") then
@@ -78,6 +115,40 @@ local function on_attach(client, bufnr)
 
 			vim.lsp.buf.signature_help()
 		end, "Signature help", "i")
+	end
+
+	-- Toggle inlay hints
+	if client:supports_method("textDocument/inlayHint") then
+		local inlay_hints_group = vim.api.nvim_create_augroup("hatch/toggle_inlay_hints", { clear = false })
+
+		if vim.g.inlay_hints then
+			vim.defer_fn(function()
+				local mode = vim.api.nvim_get_mode().mode
+				vim.lsp.inlay_hint.enable(mode == "n" or mode == "v", { bufnr = bufnr })
+			end, 500)
+		end
+
+		vim.api.nvim_create_autocmd("InsertEnter", {
+			group = inlay_hints_group,
+			desc = "Enable Inlay Hints",
+			buffer = bufnr,
+			callback = function()
+				if vim.g.inlay_hints then
+					vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
+				end
+			end,
+		})
+
+		vim.api.nvim_create_autocmd("InsertLeave", {
+			group = inlay_hints_group,
+			desc = "Disable Inlay Hints",
+			buffer = bufnr,
+			callback = function()
+				if vim.g.inlay_hints then
+					vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+				end
+			end,
+		})
 	end
 
 	-- Highlights references when holding in a location
