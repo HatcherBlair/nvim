@@ -10,6 +10,7 @@ return {
 				"cmake",
 				"comment",
 				"cpp",
+				"c_sharp",
 				"gitcommit",
 				"json",
 				"lua",

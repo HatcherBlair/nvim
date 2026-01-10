@@ -11,6 +11,7 @@ return {
 				c = { name = "clangd", timeout_ms = 500, lsp_format = "prefer" },
 				cmake = { "cmake_format" },
 				cpp = { name = "clangd", timeout_ms = 500, lsp_format = "prefer" },
+				cs = { "csharpier" },
 				lua = { "stylua" },
 				-- For fts without a formatter
 				["_"] = { "trim_whitespace", "trim_newlines" },

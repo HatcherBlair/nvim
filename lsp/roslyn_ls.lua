@@ -1,4 +1,3 @@
---- Taken straight from nvim-lspconfig
 ---@brief
 ---
 --- https://github.com/dotnet/roslyn
