@@ -23,15 +23,34 @@ vim.o.winborder = "rounded"
 -- Sync clipboard
 vim.o.clipboard = "unnamedplus"
 
+-- Silence 'wl-pase' nothing is copied error
+if vim.fn.has("linux") == 1 and vim.env.WAYLAND_DISPLAY then
+	vim.g.clipboard = {
+		name = "wl-clipboard",
+		copy = {
+			["+"] = "wl-copy --type text/plain",
+			["*"] = "wl-copy --primary text/plain",
+		},
+		paste = {
+			["+"] = { "sh", "-c", "wl-paste --no-newline 2>/dev/null || true" },
+			["*"] = { "sh", "-c", "wl-paste --primary --no-newline 2>/dev/null || true" },
+		},
+		cache_enabled = true,
+	}
+end
+
 -- Undofile
 vim.o.undofile = true
+
+-- Wrap long lines at words
+vim.o.linebreak = true
 
 -- Case insensitive search unless you start it
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
 -- Show the signcolumn
-vim.o.signcolumn = "yes"
+vim.wo.signcolumn = "yes"
 
 -- Update time
 vim.o.updatetime = 300
@@ -51,6 +70,8 @@ vim.o.confirm = true
 
 -- Preview substitutions live
 vim.o.inccommand = "split"
+
+vim.o.cmdheight = 1
 
 -- Show Erorrs/Warnings at end of line
 vim.diagnostic.config({

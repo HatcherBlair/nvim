@@ -4,6 +4,8 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Scroll upwards" })
 vim.keymap.set("n", "n", "nzzzv", { desc = "Next result" })
 vim.keymap.set("n", "N", "Nzzzv", { desc = "Previous result" })
 
+vim.keymap.set("i", "jj", "<esc>", { desc = "jj to leave insert mode" })
+
 -- Indent while remaining in visual mode
 vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")

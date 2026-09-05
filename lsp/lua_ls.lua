@@ -1,6 +1,7 @@
 -- Install with
 -- Scoop: scoop install lua-language-server
 -- Homebrew: brew install lua-language-server
+-- Arch: pacman -S lua-language-server
 
 ---@type vim.lsp.Config
 return {
@@ -12,7 +13,7 @@ return {
 		Lua = {
 			completion = { callSnippet = "Replace" },
 			-- Using stylua for formatting
-			formay = { enable = false },
+			format = { enable = false },
 			hint = {
 				enable = true,
 				arrayIndex = "Disable",
